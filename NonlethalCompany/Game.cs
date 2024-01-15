@@ -19,6 +19,20 @@ namespace NonlethalCompany
         }
     }
 
+    [HarmonyPatch(typeof(PlayerControllerB), "Update")]
+    class UnlimitedStaminaPatch
+    {
+        static void Prefix(PlayerControllerB __instance)
+        {
+            if (__instance.isExhausted || __instance.sprintMeter < 0.5f)
+            {
+                Console.WriteLine($"[Unlethal Company][Unlimited Stamina] Calling GameNetcodeStuff::PlayerControllerB::LateUpdate() with predefined threshold -> {{ __instance.isExhausted = {__instance.isExhausted}; __instance.sprintMeter = {__instance.sprintMeter} }}");
+                __instance.isExhausted = false;
+                __instance.sprintMeter = 1f;
+            }
+        }
+    }
+
     public static class Game
     {
         public static void Initialize()
