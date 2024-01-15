@@ -24,7 +24,7 @@ namespace NonlethalCompany
     {
         static void Prefix(PlayerControllerB __instance)
         {
-            if (__instance.isExhausted || __instance.sprintMeter < 0.5f)
+            if (__instance.isExhausted || __instance.sprintMeter < 0.4f)
             {
                 Console.WriteLine($"[Unlethal Company][Unlimited Stamina] Calling GameNetcodeStuff::PlayerControllerB::LateUpdate() with predefined threshold -> {{ __instance.isExhausted = {__instance.isExhausted}; __instance.sprintMeter = {__instance.sprintMeter} }}");
                 __instance.isExhausted = false;
