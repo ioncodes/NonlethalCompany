@@ -23,7 +23,7 @@ namespace Installer
             var method = type.Methods.Where(x => x.Name == "Start").First();
 
             var dllImage = ModuleDefinition.FromFile(DLL_PATH + @"\NonlethalCompany.dll");
-            TypeDefinition typeToImport = dllImage.TopLevelTypes.First(t => t.Name == "Game");
+            TypeDefinition typeToImport = dllImage.TopLevelTypes.First(t => t.Name == "Cheats");
             MethodDefinition methodToImport = typeToImport.Methods.First(m => m.Name == "Initialize");
             IMethodDefOrRef importedMethod = methodToImport.ImportWith(importer);
             method.CilMethodBody.Instructions.Insert(0, new CilInstruction(CilOpCodes.Call, importedMethod));
