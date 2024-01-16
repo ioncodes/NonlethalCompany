@@ -8,12 +8,16 @@ using UnityEngine;
 using GameNetcodeStuff;
 using System.Net;
 using System.Runtime.CompilerServices;
+using System.Runtime.Remoting.Messaging;
 
 namespace NonlethalCompany
 {
-    static class Extensions
+    internal static class Extensions
     {
-        static bool IsLocalPlayer(this PlayerControllerB player) => player.playerClientId == GameNetworkManager.Instance.localPlayerController.actualClientId;
+        internal static bool IsCurrentPlayer(this PlayerControllerB player)
+        {
+            return player.actualClientId == (GameNetworkManager.Instance?.localPlayerController?.actualClientId ?? ulong.MaxValue);
+        }
     }
 
     [HarmonyPatch(typeof(PlayerControllerB), nameof(PlayerControllerB.AllowPlayerDeath))]
@@ -21,7 +25,7 @@ namespace NonlethalCompany
     {
         static bool Prefix(PlayerControllerB __instance)
         {
-            if (!__instance.IsLocalPlayer)
+            if (!__instance.IsCurrentPlayer())
                 return true;
 
             Console.WriteLine("[Unlethal Company][God Mode] Calling PlayerControllerB::AllowPlayerDeath() -> false");
@@ -34,7 +38,7 @@ namespace NonlethalCompany
     {
         static void Prefix(PlayerControllerB __instance)
         {
-            if (!__instance.IsLocalPlayer)
+            if (!__instance.IsCurrentPlayer())
                 return;
 
             if (__instance.isExhausted || __instance.sprintMeter < 0.4f)
@@ -52,7 +56,7 @@ namespace NonlethalCompany
     {
         static void Prefix(PlayerControllerB __instance)
         {
-            if (!__instance.IsLocalPlayer)
+            if (!__instance.IsCurrentPlayer())
                 return;
 
             //Console.WriteLine($"[Unlethal Company][Player Speed] Enabling internal speed cheat...");
