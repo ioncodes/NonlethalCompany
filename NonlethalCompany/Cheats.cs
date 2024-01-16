@@ -6,14 +6,24 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 
 using GameNetcodeStuff;
+using System.Net;
+using System.Runtime.CompilerServices;
 
 namespace NonlethalCompany
 {
+    static class Extensions
+    {
+        static bool IsLocalPlayer(this PlayerControllerB player) => player.playerClientId == GameNetworkManager.Instance.localPlayerController.actualClientId;
+    }
+
     [HarmonyPatch(typeof(PlayerControllerB), nameof(PlayerControllerB.AllowPlayerDeath))]
     class GodModePatch
     {
-        static bool Prefix()
+        static bool Prefix(PlayerControllerB __instance)
         {
+            if (!__instance.IsLocalPlayer)
+                return true;
+
             Console.WriteLine("[Unlethal Company][God Mode] Calling PlayerControllerB::AllowPlayerDeath() -> false");
             return false;
         }
@@ -24,6 +34,9 @@ namespace NonlethalCompany
     {
         static void Prefix(PlayerControllerB __instance)
         {
+            if (!__instance.IsLocalPlayer)
+                return;
+
             if (__instance.isExhausted || __instance.sprintMeter < 0.4f)
             {
                 Console.WriteLine($"[Unlethal Company][Unlimited Stamina] Stamina is about to run out...");
@@ -31,6 +44,22 @@ namespace NonlethalCompany
                 __instance.isExhausted = false;
                 __instance.sprintMeter = 1f;
             }
+        }
+    }
+
+    [HarmonyPatch(typeof(PlayerControllerB), "Start")]
+    class PlayerSpeedPatch
+    {
+        static void Prefix(PlayerControllerB __instance)
+        {
+            if (!__instance.IsLocalPlayer)
+                return;
+
+            //Console.WriteLine($"[Unlethal Company][Player Speed] Enabling internal speed cheat...");
+            //__instance.isSpeedCheating = true;
+
+            Console.WriteLine($"[Unlethal Company][Player Speed] Increasing player speed...");
+            __instance.movementSpeed = 5f; // default is 0.5f
         }
     }
 
